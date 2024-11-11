@@ -1,0 +1,36 @@
+﻿@page "/productdetails/{id:int}"
+@using SolomikovPod.Services
+@inject ProductService ProductService
+@inject CartService CartService
+
+<h3>Product Details</h3>
+
+@if (Product == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h4>@Product.Name</h4>
+    <p>@Product.Description</p>
+    <p>Price: @Product.Price @Product.Currency</p>
+    <p>Stock: @Product.Stock</p>
+
+    <button class="btn btn-primary" @onclick="AddToCart">Add to Cart</button>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Product Product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Product = await ProductService.GetProduct(id);
+    }
+
+    private async Task AddToCart()
+    {
+        await CartService.AddToCart(userId: 1, productId: Product.Id, quantity: 1);
+        // Assuming userId is hardcoded for simplicity
+    }
+}

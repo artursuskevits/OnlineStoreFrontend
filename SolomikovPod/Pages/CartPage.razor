@@ -1,0 +1,33 @@
+﻿@page "/cart"
+@using SolomikovPod.Services
+@inject CartService CartService
+
+<h3>Your Cart</h3>
+
+@if (CartItems == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (CartItems.Count == 0)
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <ul>
+        @foreach (var item in CartItems)
+        {
+            <li>Product ID: @item.ProductId, Quantity: @item.Quantity</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<CartItem> CartItems = new List<CartItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var cart = await CartService.GetCart(userId: 1); // Assuming userId is hardcoded
+        CartItems = cart.Items;
+    }
+}

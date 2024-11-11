@@ -1,0 +1,37 @@
+﻿@page "/products"
+@using SolomikovPod.Services
+@inject ProductService ProductService
+
+<h3>Products</h3>
+
+@if (Products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (Products.Count == 0)
+{
+    <p>No products available at the moment.</p>
+}
+else
+{
+    <ul>
+        @foreach (var product in Products)
+        {
+            <li>
+                <strong>@product.Name</strong> - @product.Price @product.Currency
+                <br />
+                <NavLink href="@($"productdetails/{product.Id}")">View Details</NavLink>
+
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Product> Products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await ProductService.GetProducts();
+    }
+}

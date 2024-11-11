@@ -1,0 +1,26 @@
+﻿@page "/register"
+@using SolomikovPod.Services
+@inject UserService UserService
+
+<h3>Register</h3>
+
+<input @bind="Username" placeholder="Username" />
+<input type="password" @bind="Password" placeholder="Password" />
+<input @bind="Email" placeholder="Email" />
+<button class="btn btn-primary" @onclick="Register">Register</button>
+
+<p>@Message</p>
+
+@code {
+    private string Username;
+    private string Password;
+    private string Email;
+    private string Message;
+
+    private async Task Register()
+    {
+        var user = new User { Username = Username, PasswordHash = Password, Email = Email };
+        await UserService.Register(user);
+        Message = "Registration successful!";
+    }
+}

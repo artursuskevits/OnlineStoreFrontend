@@ -1,0 +1,23 @@
+﻿@page "/login"
+@using SolomikovPod.Services
+@inject UserService UserService
+
+<h3>Login</h3>
+
+<input @bind="Username" placeholder="Username" />
+<input type="password" @bind="Password" placeholder="Password" />
+<button class="btn btn-primary" @onclick="Login">Login</button>
+
+<p>@Message</p>
+
+@code {
+    private string Username;
+    private string Password;
+    private string Message;
+
+    private async Task Login()
+    {
+        var user = await UserService.Login(Username, Password);
+        Message = user != null ? "Login successful!" : "Invalid username or password.";
+    }
+}
