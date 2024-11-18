@@ -19,22 +19,23 @@ else
         @foreach (var item in CartItems)
         {
             <li>
-                <strong>@item.Product?.Name</strong> - Quantity: @item.Quantity
-                <button class="btn btn-danger btn-sm" @onclick="() => RemoveProduct(item.ProductId)">Remove</button>
+                <strong>@item.Product.Name</strong> - Quantity: @item.Quantity
+                <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(item.ProductId)">Remove</button>
             </li>
         }
     </ul>
+    <p><strong>Total: @CartTotal.ToString("0.00") MYC</strong></p>
 }
 
 @code {
     private List<CartItem> CartItems;
+    private decimal CartTotal;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var userId = UserStateService.GetCurrentUserId();
-
             if (userId <= 0)
             {
                 Console.WriteLine("Invalid user ID. Redirecting to login.");
@@ -44,6 +45,9 @@ else
 
             var cart = await CartService.GetCart(userId);
             CartItems = cart.Items;
+            CartTotal = CartItems.Sum(i => (i.Product.Price) * i.Quantity);
+
+            StateHasChanged(); // Обновляем состояние
         }
         catch (Exception ex)
         {
@@ -51,22 +55,20 @@ else
         }
     }
 
-    private async Task RemoveProduct(int productId)
+    private async Task RemoveFromCart(int productId)
     {
         try
         {
             var userId = UserStateService.GetCurrentUserId();
-
-            // Call API to remove product
             await CartService.RemoveFromCart(userId, productId);
 
-            // Refresh the cart after removal
             var cart = await CartService.GetCart(userId);
             CartItems = cart.Items;
+            CartTotal = CartItems.Sum(i => (i.Product.Price) * i.Quantity);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error removing product: {ex.Message}");
+            Console.WriteLine($"Error removing item from cart: {ex.Message}");
         }
     }
 }

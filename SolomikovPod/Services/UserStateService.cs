@@ -2,7 +2,7 @@
 {
     public class UserStateService
     {
-        public int? CurrentUserId { get; set; } = null;
+        private int? CurrentUserId { get; set; }
 
         public void SetCurrentUserId(int userId)
         {
@@ -17,10 +17,14 @@
             return CurrentUserId.Value;
         }
 
+        public bool IsUserLoggedIn()
+        {
+            return CurrentUserId.HasValue;
+        }
+
         public void ClearUserState()
         {
             CurrentUserId = null;
         }
-
     }
 }

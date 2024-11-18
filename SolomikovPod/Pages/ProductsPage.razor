@@ -21,7 +21,7 @@ else
             <div class="product-card">
                 <h4>@product.Name</h4>
                 <p>@product.Description</p>
-                <p>Price: @product.Price @product.Currency</p>
+                <p>Price: @product.Price.ToString("F2") @product.Currency</p> <!-- Format price to 2 decimal places -->
                 <p>Stock: @product.Stock</p>
                 <button @onclick="() => AddToCart(product.Id)" class="btn btn-primary">Add to Cart</button>
             </div>

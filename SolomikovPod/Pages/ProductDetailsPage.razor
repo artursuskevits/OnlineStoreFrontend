@@ -38,7 +38,16 @@ else
         try
         {
             var userId = UserStateService.GetCurrentUserId();
-            await ProductService.AddToCart(userId, Product.Id);
+
+            // Проверяем, что Product и его Id не null
+            if (Product.Id != null)
+            {
+                await ProductService.AddToCart(userId, (int)Product.Id); // Приводим Id к int
+            }
+            else
+            {
+                Console.WriteLine("Product ID is null. Cannot add to cart.");
+            }
         }
         catch (Exception ex)
         {

@@ -17,7 +17,7 @@
         public Product Product { get; set; }
 
         // Это свойство будет содержать название продукта
-        public string ProductName => Product?.Name;
+        public string ProductName => Product.Name;
     }
 
 }

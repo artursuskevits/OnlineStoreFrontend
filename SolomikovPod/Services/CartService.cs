@@ -21,6 +21,7 @@ namespace SolomikovPod.Services
         }
 
 
+
         public async Task AddToCart(int userId, int productId, int quantity)
         {
             var cartItemDto = new { ProductId = productId, Quantity = quantity };
@@ -32,6 +33,10 @@ namespace SolomikovPod.Services
         public async Task RemoveFromCart(int userId, int productId)
         {
             await _httpClient.DeleteAsync($"carts/{userId}/remove?productId={productId}");
+        }
+        public async Task Checkout(int userId)
+        {
+            await _httpClient.PostAsJsonAsync($"Payment/{userId}/checkout", new { });
         }
 
     }

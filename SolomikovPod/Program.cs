@@ -16,6 +16,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https:/
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>();
+
 builder.Services.AddScoped<UserStateService>();
 
 

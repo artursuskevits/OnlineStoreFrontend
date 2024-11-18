@@ -27,6 +27,7 @@ namespace SolomikovPod.Services
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<User>();
         }
+
     }
 
     public class LoginRequest

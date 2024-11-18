@@ -1,4 +1,5 @@
-﻿@page "/login"
+﻿@using SolomikovPod.Models
+@page "/login"
 @inject UserService UserService
 @inject UserStateService UserStateService
 @inject NavigationManager NavigationManager
@@ -26,16 +27,18 @@
     {
         try
         {
+            // Создаем экземпляр LoginRequest
             var loginRequest = new LoginRequest
                 {
                     Username = Username,
                     Password = Password
                 };
 
-            var user = await UserService.Login(loginRequest);
+            var user = await UserService.Login(loginRequest); // Передаем LoginRequest
+
             if (user != null)
             {
-                UserStateService.SetCurrentUserId(user.Id);
+                UserStateService.SetCurrentUserId(user.Id); // Установка ID пользователя
                 NavigationManager.NavigateTo("/products");
             }
             else
@@ -48,4 +51,7 @@
             Message = $"Login failed: {ex.Message}";
         }
     }
+
+
+
 }
