@@ -19,17 +19,46 @@ else
         @foreach (var item in CartItems)
         {
             <li>
-                <strong>@item.Product.Name</strong> - Quantity: @item.Quantity
+                <strong>@item.Product?.Name</strong> - Quantity: @item.Quantity
                 <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(item.ProductId)">Remove</button>
+
             </li>
         }
     </ul>
     <p><strong>Total: @CartTotal.ToString("0.00") MYC</strong></p>
+    <button class="btn btn-success" @onclick="ShowPaymentForm">Proceed to Checkout</button>
 }
+
+@if (ShowPayment)
+{
+    <div class="payment-form">
+        <h4>Payment Information</h4>
+        <div>
+            <label>Cardholder Name:</label>
+            <input @bind="CardholderName" />
+        </div>
+        <div>
+            <label>Card Number:</label>
+            <input @bind="CardNumber" type="text" />
+        </div>
+        <div>
+            <label>CVV:</label>
+            <input @bind="CVV" type="password" />
+        </div>
+        <button class="btn btn-primary" @onclick="ProceedToCheckout">Pay Now</button>
+    </div>
+}
+
+<p>@PaymentMessage</p>
 
 @code {
     private List<CartItem> CartItems;
     private decimal CartTotal;
+    private string PaymentMessage;
+    private bool ShowPayment;
+    private string CardholderName;
+    private string CardNumber;
+    private string CVV;
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,9 +72,20 @@ else
                 return;
             }
 
+            Console.WriteLine($"Fetching cart for user ID: {userId}");
+
             var cart = await CartService.GetCart(userId);
-            CartItems = cart.Items;
-            CartTotal = CartItems.Sum(i => (i.Product.Price) * i.Quantity);
+
+            if (cart == null)
+            {
+                Console.WriteLine("Cart is null.");
+            }
+            else
+            {
+                Console.WriteLine($"Cart retrieved successfully: {cart.Items.Count} items.");
+                CartItems = cart.Items;
+                CartTotal = CartItems.Sum(i => (i.Product?.Price ?? 0) * i.Quantity);
+            }
 
             StateHasChanged(); // Обновляем состояние
         }
@@ -54,6 +94,7 @@ else
             Console.WriteLine($"Error loading cart: {ex.Message}");
         }
     }
+
 
     private async Task RemoveFromCart(int productId)
     {
@@ -64,11 +105,46 @@ else
 
             var cart = await CartService.GetCart(userId);
             CartItems = cart.Items;
-            CartTotal = CartItems.Sum(i => (i.Product.Price) * i.Quantity);
+            CartTotal = CartItems.Sum(i => (i.Product?.Price ?? 0) * i.Quantity);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error removing item from cart: {ex.Message}");
+        }
+    }
+
+    private void ShowPaymentForm()
+    {
+        ShowPayment = true;
+    }
+
+    private async Task ProceedToCheckout()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(CardholderName) || string.IsNullOrEmpty(CardNumber) || string.IsNullOrEmpty(CVV))
+            {
+                PaymentMessage = "Please fill in all payment details.";
+                return;
+            }
+
+            var userId = UserStateService.GetCurrentUserId();
+            var response = await CartService.Checkout(userId);
+            if (response.IsSuccessStatusCode)
+            {
+                PaymentMessage = "Payment successful! Thank you for your purchase.";
+                CartItems.Clear(); // Очищаем корзину после оплаты
+                CartTotal = 0;
+                ShowPayment = false;
+            }
+            else
+            {
+                PaymentMessage = "Payment failed: " + await response.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            PaymentMessage = $"Error during payment: {ex.Message}";
         }
     }
 }
