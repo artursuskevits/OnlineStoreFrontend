@@ -1,12 +1,19 @@
 ﻿@page "/login"
-@using SolomikovPod.Services
 @inject UserService UserService
+@inject UserStateService UserStateService
+@inject NavigationManager NavigationManager
 
 <h3>Login</h3>
 
-<input @bind="Username" placeholder="Username" />
-<input type="password" @bind="Password" placeholder="Password" />
-<button class="btn btn-primary" @onclick="Login">Login</button>
+<div>
+    <label>Username:</label>
+    <input @bind="Username" />
+</div>
+<div>
+    <label>Password:</label>
+    <input type="password" @bind="Password" />
+</div>
+<button @onclick="Login">Login</button>
 
 <p>@Message</p>
 
@@ -17,7 +24,24 @@
 
     private async Task Login()
     {
-        var user = await UserService.Login(Username, Password);
-        Message = user != null ? "Login successful!" : "Invalid username or password.";
+        try
+        {
+            var loginRequest = new { Username, Password };
+            var user = await UserService.Login(loginRequest);
+
+            if (user != null)
+            {
+                UserStateService.SetCurrentUserId(user.Id);
+                NavigationManager.NavigateTo("/products");
+            }
+            else
+            {
+                Message = "Invalid username or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error: {ex.Message}";
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using SolomikovPod.Models;
 
 namespace SolomikovPod.Services
 {
@@ -24,29 +25,9 @@ namespace SolomikovPod.Services
             return await _httpClient.GetFromJsonAsync<Product>($"Products/{id}");
         }
 
-        public async Task AddProduct(Product product)
+        public async Task AddToCart(int userId, int productId)
         {
-            await _httpClient.PostAsJsonAsync("Products", product);
+            await _httpClient.PostAsJsonAsync($"Carts/{userId}/add", new { productId, quantity = 1 });
         }
-
-        public async Task UpdateProduct(int id, Product product)
-        {
-            await _httpClient.PutAsJsonAsync($"Products/{id}", product);
-        }
-
-        public async Task DeleteProduct(int id)
-        {
-            await _httpClient.DeleteAsync($"Products/{id}");
-        }
-    }
-
-    public class Product
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int Stock { get; set; }
-        public string Currency { get; set; }
     }
 }

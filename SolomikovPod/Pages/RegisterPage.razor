@@ -1,13 +1,21 @@
 ﻿@page "/register"
-@using SolomikovPod.Services
 @inject UserService UserService
 
 <h3>Register</h3>
 
-<input @bind="Username" placeholder="Username" />
-<input type="password" @bind="Password" placeholder="Password" />
-<input @bind="Email" placeholder="Email" />
-<button class="btn btn-primary" @onclick="Register">Register</button>
+<div>
+    <label>Username:</label>
+    <input @bind="Username" />
+</div>
+<div>
+    <label>Password:</label>
+    <input type="password" @bind="Password" />
+</div>
+<div>
+    <label>Email:</label>
+    <input @bind="Email" />
+</div>
+<button @onclick="Register">Register</button>
 
 <p>@Message</p>
 

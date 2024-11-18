@@ -1,6 +1,6 @@
 ﻿@page "/cart"
-@using SolomikovPod.Services
 @inject CartService CartService
+@inject UserStateService UserStateService
 
 <h3>Your Cart</h3>
 
@@ -10,24 +10,50 @@
 }
 else if (CartItems.Count == 0)
 {
-    <p>Your cart is empty.</p>
+    <p>Your cart is empty. <a href="/products">Go shopping</a></p>
 }
 else
 {
-    <ul>
+    <ul class="cart-items">
         @foreach (var item in CartItems)
         {
-            <li>Product ID: @item.ProductId, Quantity: @item.Quantity</li>
+            <li>
+                Product ID: @item.ProductId, Quantity: @item.Quantity
+                <button @onclick="() => RemoveFromCart(item.ProductId)">Remove</button>
+            </li>
         }
     </ul>
 }
 
 @code {
-    private List<CartItem> CartItems = new List<CartItem>();
+    private List<CartItem> CartItems;
 
     protected override async Task OnInitializedAsync()
     {
-        var cart = await CartService.GetCart(userId: 1); // Assuming userId is hardcoded
-        CartItems = cart.Items;
+        try
+        {
+            var userId = UserStateService.GetCurrentUserId();
+            var cart = await CartService.GetCart(userId);
+            CartItems = cart.Items;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading cart: {ex.Message}");
+        }
+    }
+
+    private async Task RemoveFromCart(int productId)
+    {
+        try
+        {
+            var userId = UserStateService.GetCurrentUserId();
+            await CartService.RemoveFromCart(userId, productId);
+            var cart = await CartService.GetCart(userId);
+            CartItems = cart.Items;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing item from cart: {ex.Message}");
+        }
     }
 }

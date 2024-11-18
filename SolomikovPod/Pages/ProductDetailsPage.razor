@@ -1,7 +1,6 @@
 ﻿@page "/productdetails/{id:int}"
-@using SolomikovPod.Services
 @inject ProductService ProductService
-@inject CartService CartService
+@using SolomikovPod.Models
 
 <h3>Product Details</h3>
 
@@ -15,7 +14,6 @@ else
     <p>@Product.Description</p>
     <p>Price: @Product.Price @Product.Currency</p>
     <p>Stock: @Product.Stock</p>
-
     <button class="btn btn-primary" @onclick="AddToCart">Add to Cart</button>
 }
 
@@ -30,7 +28,6 @@ else
 
     private async Task AddToCart()
     {
-        await CartService.AddToCart(userId: 1, productId: Product.Id, quantity: 1);
-        // Assuming userId is hardcoded for simplicity
+        await ProductService.AddToCart(1, Product.Id); // Replace 1 with the actual user ID
     }
 }
