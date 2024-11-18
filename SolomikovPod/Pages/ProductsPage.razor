@@ -1,5 +1,7 @@
 ﻿@page "/products"
 @inject ProductService ProductService
+@inject CartService CartService
+@inject UserStateService UserStateService
 
 <h3>Products</h3>
 
@@ -32,23 +34,27 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Products = await ProductService.GetProducts();
+        try
+        {
+            Products = await ProductService.GetProducts();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching products: {ex.Message}");
+        }
     }
-
-    @inject UserStateService UserStateService
 
     private async Task AddToCart(int productId)
     {
         try
         {
-            var userId = UserStateService.GetCurrentUserId(); // Убедитесь, что возвращается int
-            await ProductService.AddToCart(userId, productId);
+            var userId = UserStateService.GetCurrentUserId();
+            await CartService.AddToCart(userId, productId, 1); // Adding 1 quantity by default
+            Console.WriteLine($"Product {productId} added to cart.");
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Error adding product to cart: {ex.Message}");
         }
     }
-
-
 }

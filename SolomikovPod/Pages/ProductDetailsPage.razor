@@ -1,6 +1,6 @@
 ﻿@page "/productdetails/{id:int}"
 @inject ProductService ProductService
-@using SolomikovPod.Models
+@inject UserStateService UserStateService
 
 <h3>Product Details</h3>
 
@@ -23,11 +23,26 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Product = await ProductService.GetProduct(id);
+        try
+        {
+            Product = await ProductService.GetProduct(id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading product details: {ex.Message}");
+        }
     }
 
     private async Task AddToCart()
     {
-        await ProductService.AddToCart(1, Product.Id); // Replace 1 with the actual user ID
+        try
+        {
+            var userId = UserStateService.GetCurrentUserId();
+            await ProductService.AddToCart(userId, Product.Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding to cart: {ex.Message}");
+        }
     }
 }

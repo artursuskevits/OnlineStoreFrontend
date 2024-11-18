@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using SolomikovPod.Models;
 
 namespace SolomikovPod.Services
@@ -17,19 +17,26 @@ namespace SolomikovPod.Services
 
         public async Task<List<Product>> GetProducts()
         {
-            return await _httpClient.GetFromJsonAsync<List<Product>>("Products");
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<List<Product>>("products");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching products: {ex.Message}");
+                return new List<Product>();
+            }
         }
+
 
         public async Task<Product> GetProduct(int id)
         {
-            return await _httpClient.GetFromJsonAsync<Product>($"Products/{id}");
+            return await _httpClient.GetFromJsonAsync<Product>($"products/{id}");
         }
 
-        public async Task AddToCart(int userId, int productId)
+        public async Task AddToCart(int userId, int productId, int quantity = 1)
         {
-            var response = await _httpClient.PostAsync($"Carts/{userId}/add?productId={productId}&quantity=1", null);
-            response.EnsureSuccessStatusCode();
+            await _httpClient.PostAsJsonAsync($"Carts/{userId}/add", new { productId, quantity });
         }
-
     }
 }
