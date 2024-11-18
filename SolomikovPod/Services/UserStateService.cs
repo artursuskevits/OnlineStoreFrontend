@@ -21,5 +21,6 @@
         {
             CurrentUserId = null;
         }
+
     }
 }

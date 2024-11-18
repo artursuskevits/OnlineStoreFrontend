@@ -27,7 +27,9 @@ namespace SolomikovPod.Services
 
         public async Task AddToCart(int userId, int productId)
         {
-            await _httpClient.PostAsJsonAsync($"Carts/{userId}/add", new { productId, quantity = 1 });
+            var response = await _httpClient.PostAsync($"Carts/{userId}/add?productId={productId}&quantity=1", null);
+            response.EnsureSuccessStatusCode();
         }
+
     }
 }

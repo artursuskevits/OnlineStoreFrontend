@@ -26,9 +26,13 @@
     {
         try
         {
-            var loginRequest = new { Username, Password };
-            var user = await UserService.Login(loginRequest);
+            var loginRequest = new LoginRequest
+                {
+                    Username = Username,
+                    Password = Password
+                };
 
+            var user = await UserService.Login(loginRequest);
             if (user != null)
             {
                 UserStateService.SetCurrentUserId(user.Id);
@@ -41,7 +45,7 @@
         }
         catch (Exception ex)
         {
-            Message = $"Error: {ex.Message}";
+            Message = $"Login failed: {ex.Message}";
         }
     }
 }

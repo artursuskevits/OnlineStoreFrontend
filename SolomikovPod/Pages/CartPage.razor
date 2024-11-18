@@ -1,6 +1,8 @@
 ﻿@page "/cart"
 @inject CartService CartService
+@inject ProductService ProductService
 @inject UserStateService UserStateService
+@inject NavigationManager NavigationManager
 
 <h3>Your Cart</h3>
 
@@ -18,23 +20,44 @@ else
         @foreach (var item in CartItems)
         {
             <li>
-                Product ID: @item.ProductId, Quantity: @item.Quantity
-                <button @onclick="() => RemoveFromCart(item.ProductId)">Remove</button>
+                <strong>@item.ProductName</strong> - Quantity: @item.Quantity
+                <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(item.ProductId)">Remove</button>
             </li>
         }
     </ul>
 }
 
 @code {
-    private List<CartItem> CartItems;
+    private List<CartItemViewModel> CartItems;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var userId = UserStateService.GetCurrentUserId();
+
+            if (userId <= 0)
+            {
+                Console.WriteLine("Invalid user ID. Redirecting to login.");
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            // Fetch the user's cart
             var cart = await CartService.GetCart(userId);
-            CartItems = cart.Items;
+
+            // Map cart items to view models with product names
+            CartItems = new List<CartItemViewModel>();
+            foreach (var item in cart.Items)
+            {
+                var product = await ProductService.GetProduct(item.ProductId);
+                CartItems.Add(new CartItemViewModel
+                    {
+                        ProductId = item.ProductId,
+                        ProductName = product.Name,
+                        Quantity = item.Quantity
+                    });
+            }
         }
         catch (Exception ex)
         {
@@ -48,12 +71,32 @@ else
         {
             var userId = UserStateService.GetCurrentUserId();
             await CartService.RemoveFromCart(userId, productId);
+
+            // Refresh the cart after removing an item
             var cart = await CartService.GetCart(userId);
-            CartItems = cart.Items;
+
+            CartItems = new List<CartItemViewModel>();
+            foreach (var item in cart.Items)
+            {
+                var product = await ProductService.GetProduct(item.ProductId);
+                CartItems.Add(new CartItemViewModel
+                    {
+                        ProductId = item.ProductId,
+                        ProductName = product.Name,
+                        Quantity = item.Quantity
+                    });
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error removing item from cart: {ex.Message}");
         }
+    }
+
+    private class CartItemViewModel
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
     }
 }

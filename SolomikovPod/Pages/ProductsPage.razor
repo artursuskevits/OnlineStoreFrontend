@@ -35,8 +35,20 @@ else
         Products = await ProductService.GetProducts();
     }
 
+    @inject UserStateService UserStateService
+
     private async Task AddToCart(int productId)
     {
-        await ProductService.AddToCart(1, productId); // Здесь может быть ID текущего пользователя
+        try
+        {
+            var userId = UserStateService.GetCurrentUserId(); // Убедитесь, что возвращается int
+            await ProductService.AddToCart(userId, productId);
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
+
+
 }
