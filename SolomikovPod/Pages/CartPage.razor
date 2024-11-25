@@ -1,6 +1,7 @@
 ﻿@page "/cart"
 @inject CartService CartService
 @inject UserStateService UserStateService
+@inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
 <h3>Your Cart</h3>
@@ -163,19 +164,25 @@ else
             StateHasChanged();
         }
     }
-
     private async Task ProceedToCheckout()
     {
         try
         {
             var userId = UserStateService.GetCurrentUserId();
-            var response = await CartService.Checkout(userId);
+
+            // Использование инжектированного HttpClient для завершения оплаты
+            var response = await HttpClient.PostAsync($"https://localhost:7079/api/carts/{userId}/checkout", null); // Изменён URL для вызова CartsController
+
             if (response.IsSuccessStatusCode)
             {
+                // Если оплата прошла успешно
                 PaymentMessage = "Payment successful! Thank you for your purchase.";
                 CartItems.Clear(); // Очищаем корзину после оплаты
                 CartTotal = 0;
                 ShowPayment = false;
+
+                // Вызовите обновление состояния для обновления UI
+                StateHasChanged();
             }
             else
             {
@@ -187,4 +194,6 @@ else
             PaymentMessage = $"Error during payment: {ex.Message}";
         }
     }
+
+
 }
