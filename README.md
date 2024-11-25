@@ -137,11 +137,6 @@ Testing ensures that the application meets functional and non-functional require
 - Implements basic user registration and login checks.
 - Passwords are hashed before storage.
 
-**Recommendations**:
-1. Replace outdated password hashing (e.g., SHA256 without a salt) with secure libraries like `BCrypt`.
-2. Avoid returning sensitive user data. Instead, return tokens or minimal information.
-3. Move password-related logic into a separate service for better maintainability.
-
 ---
 
 ## Core Functions
