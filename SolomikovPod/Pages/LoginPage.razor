@@ -1,5 +1,4 @@
-﻿@using SolomikovPod.Models
-@page "/login"
+﻿@page "/login"
 @inject UserService UserService
 @inject UserStateService UserStateService
 @inject NavigationManager NavigationManager
@@ -14,6 +13,10 @@
     <label>Password:</label>
     <input type="password" @bind="Password" />
 </div>
+<div>
+    <label>Email:</label>
+    <input @bind="Email" />
+</div>
 <button @onclick="Login">Login</button>
 
 <p>@Message</p>
@@ -21,20 +24,15 @@
 @code {
     private string Username;
     private string Password;
+    private string Email;
     private string Message;
 
     private async Task Login()
     {
         try
         {
-            // Создаем экземпляр LoginRequest
-            var loginRequest = new LoginRequest
-                {
-                    Username = Username,
-                    Password = Password
-                };
-
-            var user = await UserService.Login(loginRequest); // Передаем LoginRequest
+            var loginRequest = new LoginRequest { Username = Username, Password = Password, Email=Email }; // Формируем объект для передачи
+            var user = await UserService.Login(loginRequest); // Передаем объект
 
             if (user != null)
             {
@@ -51,7 +49,4 @@
             Message = $"Login failed: {ex.Message}";
         }
     }
-
-
-
 }

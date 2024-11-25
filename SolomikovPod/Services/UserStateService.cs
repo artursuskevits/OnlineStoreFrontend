@@ -1,30 +1,25 @@
-﻿namespace SolomikovPod.Services
+﻿public class UserStateService
 {
-    public class UserStateService
+    private int? _currentUserId;
+
+    public void SetCurrentUserId(int userId)
     {
-        private int? CurrentUserId { get; set; }
-
-        public void SetCurrentUserId(int userId)
-        {
-            CurrentUserId = userId;
-        }
-
-        public int GetCurrentUserId()
-        {
-            if (CurrentUserId == null)
-                throw new InvalidOperationException("User is not logged in.");
-
-            return CurrentUserId.Value;
-        }
-
-        public bool IsUserLoggedIn()
-        {
-            return CurrentUserId.HasValue;
-        }
-
-        public void ClearUserState()
-        {
-            CurrentUserId = null;
-        }
+        _currentUserId = userId;
     }
+
+    public int GetCurrentUserId()
+    {
+        return _currentUserId ?? -1;
+    }
+
+    public bool IsLoggedIn()
+    {
+        return _currentUserId.HasValue;
+    }
+
+    public void Logout()
+    {
+        _currentUserId = null;
+    }
+
 }

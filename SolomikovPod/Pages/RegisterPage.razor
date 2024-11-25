@@ -1,5 +1,7 @@
 ﻿@page "/register"
 @inject UserService UserService
+@inject UserStateService UserStateService
+@inject NavigationManager NavigationManager
 
 <h3>Register</h3>
 
@@ -22,13 +24,36 @@
 @code {
     private string Username;
     private string Password;
-    private string Email;
+    private string Email; // Added Email field
     private string Message;
 
     private async Task Register()
     {
-        var user = new User { Username = Username, PasswordHash = Password, Email = Email };
-        await UserService.Register(user);
-        Message = "Registration successful!";
+        try
+        {
+            // Create a User object with the necessary properties for registration
+            var newUser = new User
+                {
+                    Username = Username,
+                    Password = Password, // Ideally this should be hashed by the server
+                    Email = Email
+                };
+
+            var user = await UserService.Register(newUser);
+
+            if (user != null)
+            {
+                UserStateService.SetCurrentUserId(user.Id);
+                NavigationManager.NavigateTo("/products");
+            }
+            else
+            {
+                Message = "Registration failed.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Registration failed: {ex.Message}";
+        }
     }
 }

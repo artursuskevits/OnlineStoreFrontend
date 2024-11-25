@@ -34,5 +34,8 @@ namespace SolomikovPod.Services
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Email { get; set; } // Add Email here if needed for registration
     }
+
+
 }
